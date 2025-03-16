@@ -55,4 +55,15 @@ public static class AzureAppConfigurationExtensions
         var resource = new AzureAppConfigurationResource(name, configureInfrastructure);
         return builder.AddResource(resource);
     }
+
+    /// <summary>
+    /// POC
+    /// </summary>
+    public static IResourceBuilder<AzureAppConfigurationResource> RunAsEmulator(this IResourceBuilder<AzureAppConfigurationResource> builder)
+    {
+        builder.WithEndpoint(name: "emulator", scheme: "http", targetPort: 80)
+               .WithAnnotation(new ContainerImageAnnotation { Image = "docker.io/charlesliangzhy/mykvapi", Tag = "2.0" });
+
+        return builder;
+    }
 }
