@@ -77,6 +77,7 @@ public static class AspireAppConfigurationExtensions
         }, optional);
 
         // Register IConfigurationRefresherProvider for App Configuration provider
+        // Also add the logging
         builder.Services.AddAzureAppConfiguration();
 
         if (!settings.DisableTracing)
