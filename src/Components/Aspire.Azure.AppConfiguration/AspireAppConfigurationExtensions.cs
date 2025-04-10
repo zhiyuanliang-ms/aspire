@@ -67,6 +67,8 @@ public static class AspireAppConfigurationExtensions
                 var namePrefix = "Azure_AppConfiguration";
                 builder.TryAddHealthCheck(new HealthCheckRegistration(
                     namePrefix,
+                    // This is a new feature we are implementing for the App Configuration provider library
+                    // PR: https://github.com/Azure/AppConfiguration-DotnetProvider/pull/644
                     options.GetHealthCheck(),
                     failureStatus: default,
                     tags: default,
