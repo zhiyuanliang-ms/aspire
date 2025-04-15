@@ -45,6 +45,8 @@ public abstract class ConformanceTests<TService, TOptions>
 
     protected virtual bool SupportsKeyedRegistrations => false;
 
+    protected virtual bool IsBuiltBeforeHost => false;
+
     protected bool MetricsAreSupported => CheckIfImplemented(SetMetrics);
 
     // every Component has to support health checks, this property is a temporary workaround
@@ -366,6 +368,8 @@ public abstract class ConformanceTests<TService, TOptions>
     [InlineData(false)]
     public void ConnectionInformationIsDelayValidated(bool useKey)
     {
+        SkipIfServiceIsBuiltBeforeHostIsBuilt();
+
         SetupConnectionInformationIsDelayValidated();
 
         var builder = Host.CreateEmptyApplicationBuilder(null);
@@ -540,6 +544,14 @@ public abstract class ConformanceTests<TService, TOptions>
         if (!SupportsNamedConfig || ConfigurationSectionName is null)
         {
             Assert.Skip("Named configuration is not supported.");
+        }
+    }
+
+    protected void SkipIfServiceIsBuiltBeforeHostIsBuilt()
+    {
+        if (IsBuiltBeforeHost)
+        {
+            Assert.Skip("Service is built before host is built.");
         }
     }
 

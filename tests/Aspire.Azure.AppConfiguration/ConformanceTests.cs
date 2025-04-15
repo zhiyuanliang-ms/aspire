@@ -4,6 +4,8 @@
 //using System.Text;
 using Aspire.Components.ConformanceTests;
 using Azure.Core;
+using Azure.Identity;
+using Azure.Data.AppConfiguration;
 using Microsoft.DotNet.RemoteExecutor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
@@ -19,11 +21,13 @@ public class ConformanceTests : ConformanceTests<IConfigurationRefresherProvider
 
     protected override ServiceLifetime ServiceLifetime => ServiceLifetime.Singleton;
 
-    protected override string ActivitySourceName => "Azure.Data.AppConfiguration.ConfigurationClient";
+    protected override string ActivitySourceName => "Microsoft.Extensions.Configuration.AzureAppConfiguration";
 
     protected override string[] RequiredLogCategories => new string[] { "Microsoft.Extensions.Configuration.AzureAppConfiguration.Refresh" };
 
     protected override bool SupportsKeyedRegistrations => false;
+
+    protected override bool IsBuiltBeforeHost => true;
 
     protected override string ValidJsonConfig => """
         {
@@ -44,7 +48,7 @@ public class ConformanceTests : ConformanceTests<IConfigurationRefresherProvider
     protected override void PopulateConfiguration(ConfigurationManager configuration, string? key = null)
         => configuration.AddInMemoryCollection(new KeyValuePair<string, string?>[]
         {
-            new(CreateConfigKey("Aspire:Azure:Data:AppConfiguration", key, "Endpoint"), Endpoint)
+            new(CreateConfigKey("Aspire:Azure:AppConfiguration", null, "Endpoint"), Endpoint)
         });
 
     protected override void RegisterComponent(HostApplicationBuilder builder, Action<AzureAppConfigurationSettings>? configure = null, string? key = null)
@@ -58,9 +62,10 @@ public class ConformanceTests : ConformanceTests<IConfigurationRefresherProvider
             },
             options =>
             {
+                options.MinBackoffDuration = TimeSpan.FromSeconds(1);
                 options.ConfigureRefresh(refreshOptions =>
                 {
-                    refreshOptions.RegisterAll()
+                    refreshOptions.Register("sentinel")
                         .SetRefreshInterval(TimeSpan.FromSeconds(1));
                 });
                 options.ConfigureStartupOptions(startupOptions =>
@@ -70,6 +75,10 @@ public class ConformanceTests : ConformanceTests<IConfigurationRefresherProvider
                 options.ConfigureClientOptions(clientOptions => clientOptions.Retry.MaxRetries = 0);
             },
             optional: true);
+
+        var op = new ConfigurationClientOptions();
+        op.Retry.MaxRetries = 0;
+        builder.Services.AddSingleton(new ConfigurationClient(new Uri(Endpoint), new DefaultAzureCredential(), op));
     }
 
     protected override (string json, string error)[] InvalidJsonToErrorMessage => new[]
@@ -89,6 +98,7 @@ public class ConformanceTests : ConformanceTests<IConfigurationRefresherProvider
 
     protected override void TriggerActivity(IConfigurationRefresherProvider service)
     {
+        Thread.Sleep(1000);
         service.Refreshers.First().RefreshAsync().ConfigureAwait(false).GetAwaiter().GetResult();
     }
 

@@ -3,7 +3,6 @@
 
 using Aspire.Azure.AppConfiguration;
 using Azure.Identity;
-using Azure.Data.AppConfiguration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -83,7 +82,7 @@ public static class AspireAppConfigurationExtensions
         if (!settings.DisableTracing)
         {
             builder.Services.AddOpenTelemetry()
-                .WithTracing(traceBuilder => traceBuilder.AddSource([$"{typeof(ConfigurationClient).Namespace}.*"]));
+                .WithTracing(traceBuilder => traceBuilder.AddSource(["Microsoft.Extensions.Configuration.AzureAppConfiguration"]));
         }
     }
 
