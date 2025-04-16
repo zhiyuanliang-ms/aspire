@@ -7,8 +7,6 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Aspire.Azure.Common;
-using Aspire;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -56,28 +54,23 @@ public static class AspireAppConfigurationExtensions
             throw new InvalidOperationException($"Endpoint is missing. It should be provided in 'ConnectionStrings:{connectionName}' or under the 'Endpoint' key in the '{DefaultConfigSectionName}' configuration section.");
         }
 
-        builder.Configuration.AddAzureAppConfiguration(options =>
-        {
-            options.Connect(settings.Endpoint, settings.Credential ?? new DefaultAzureCredential());
-            configureOptions?.Invoke(options);
-
-            if (!settings.DisableHealthChecks)
+        builder.Configuration
+            .AddAzureAppConfiguration(
+            options =>
             {
-                var namePrefix = "Azure_AppConfiguration";
-                builder.TryAddHealthCheck(new HealthCheckRegistration(
-                    namePrefix,
-                    // This is a new feature we are implementing for the App Configuration provider library
-                    // PR: https://github.com/Azure/AppConfiguration-DotnetProvider/pull/644
-                    options.GetHealthCheck(),
-                    failureStatus: default,
-                    tags: default,
-                    timeout: default));
-            }
-        }, optional);
+                options.Connect(settings.Endpoint, settings.Credential ?? new DefaultAzureCredential());
+                configureOptions?.Invoke(options);
+            },
+            optional);
 
-        // Register IConfigurationRefresherProvider for App Configuration provider
-        // Also add the logging
-        builder.Services.AddAzureAppConfiguration();
+        builder.Services.AddAzureAppConfiguration(); // register IConfigurationRefresherProvider service
+
+        if (!settings.DisableHealthChecks)
+        {
+            builder.Services
+                .AddHealthChecks()
+                .AddAzureAppConfiguration(); // register health check service for Azure App Configuration
+        }
 
         if (!settings.DisableTracing)
         {
