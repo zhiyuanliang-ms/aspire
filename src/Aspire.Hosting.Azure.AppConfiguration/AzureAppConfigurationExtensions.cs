@@ -69,9 +69,9 @@ public static class AzureAppConfigurationExtensions
     /// This version of the package defaults to the <inheritdoc cref="AppConfigurationEmulatorContainerImageTags.Tag"/> tag of the <inheritdoc cref="AppConfigurationEmulatorContainerImageTags.Registry"/>/<inheritdoc cref="AppConfigurationEmulatorContainerImageTags.Image"/> container image.
     /// </remarks>
     /// <param name="builder">The Azure App Configuration resource builder.</param>
-    /// <param name="configureContainer">Callback that exposes underlying container used for emulation to allow for customization.</param>
+    /// <param name="configureEmulator">Callback that exposes underlying container used for emulation to allow for customization.</param>
     /// <returns>A reference to the <see cref="IResourceBuilder{T}"/>.</returns>
-    public static IResourceBuilder<AzureAppConfigurationResource> RunAsEmulator(this IResourceBuilder<AzureAppConfigurationResource> builder, Action<IResourceBuilder<AzureAppConfigurationEmulatorResource>>? configureContainer = null)
+    public static IResourceBuilder<AzureAppConfigurationResource> RunAsEmulator(this IResourceBuilder<AzureAppConfigurationResource> builder, Action<IResourceBuilder<AzureAppConfigurationEmulatorResource>>? configureEmulator = null)
     {
         if (builder.ApplicationBuilder.ExecutionContext.IsPublishMode)
         {
@@ -86,11 +86,11 @@ public static class AzureAppConfigurationExtensions
                 Tag = AppConfigurationEmulatorContainerImageTags.Tag
             });
 
-        if (configureContainer != null)
+        if (configureEmulator != null)
         {
             var surrogate = new AzureAppConfigurationEmulatorResource(builder.Resource);
             var surrogateBuilder = builder.ApplicationBuilder.CreateResourceBuilder(surrogate);
-            configureContainer(surrogateBuilder);
+            configureEmulator(surrogateBuilder);
         }
 
         return builder;
@@ -108,6 +108,36 @@ public static class AzureAppConfigurationExtensions
         ArgumentException.ThrowIfNullOrEmpty(filePath, nameof(filePath));
 
         return builder.WithBindMount(filePath, "/app/.aace/kv.ndjson", isReadOnly: false);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="role"> The role to assign to the anonymous user. Defaults to "Owner".</param>
+    /// <returns></returns>
+    public static IResourceBuilder<AzureAppConfigurationEmulatorResource> WithAnonymousAccess(this IResourceBuilder<AzureAppConfigurationEmulatorResource> builder, string role = "Owner")
+    {
+        builder.Resource.EnableAnonymousAuthentication(role);
+        builder.WithEnvironment("Tenant:AnonymousAuthEnabled", "true");
+        builder.WithEnvironment("Authentication:Anonymous:AnonymousUserRole", role);
+        return builder;
+    }
+
+    /// <summary>
+    ///  
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="id"></param>
+    /// <param name="secret"></param>
+    /// <returns></returns>
+    public static IResourceBuilder<AzureAppConfigurationEmulatorResource> WithAccessKey(this IResourceBuilder<AzureAppConfigurationEmulatorResource> builder, string id, string secret)
+    {
+        int index = builder.Resource.AddAccessKey(id, secret);
+        builder.WithEnvironment("Tenant:HmacSha256Enabled", "true");
+        builder.WithEnvironment($"Tenant:AccessKeys:{index}:Id", id);
+        builder.WithEnvironment($"Tenant:AccessKeys:{index}:Secret", secret);
+        return builder;
     }
 
     /// <summary>

@@ -9,5 +9,5 @@ internal static class AppConfigurationEmulatorContainerImageTags
 
     public const string Image = "charlesliangzhy/appconfig-emulator";
 
-    public const string Tag = "0.0.2";
+    public const string Tag = "0.0.3";
 }

@@ -5,8 +5,12 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 var appConfig = builder
     .AddAzureAppConfiguration("aspire-appconfig")
-    .RunAsEmulator(container =>
-        container.WithDataBindMount("C:/Users/zhiyuanliang/Downloads/.aace/kv.ndjson"));
+    .RunAsEmulator(emulator =>
+    {
+        emulator.WithDataBindMount("C:/Users/zhiyuanliang/Downloads/.aace/kv.ndjson");
+        //emulator.WithAnonymousAccess();
+        //emulator.WithAccessKey("xxxx", "xxxx");
+    });
 
 builder.AddProject<Projects.WorkerService>("workerservice")
     .WithReference(appConfig);

@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Aspire.Hosting.ApplicationModel;
+using Aspire.Hosting.Azure.AppConfiguration;
 using Azure.Provisioning.AppConfiguration;
 using Azure.Provisioning.Primitives;
 
@@ -17,6 +18,7 @@ public class AzureAppConfigurationResource(string name, Action<AzureResourceInfr
     IResourceWithConnectionString, IResourceWithEndpoints
 {
     internal EndpointReference EmulatorEndpoint => new(this, "emulator");
+    internal AzureAppConfigurationEmulatorOptions EmulatorOptions { get; } = new AzureAppConfigurationEmulatorOptions();
 
     /// <summary>
     /// Gets a value indicating whether the Azure App Configuration resource is running in the local emulator.
@@ -38,7 +40,7 @@ public class AzureAppConfigurationResource(string name, Action<AzureResourceInfr
     /// </summary>
     public ReferenceExpression ConnectionStringExpression =>
         IsEmulator
-        ? ReferenceExpression.Create($"{EmulatorEndpoint}")
+        ? AzureAppConfigurationEmulatorConnectionString.Create(EmulatorEndpoint, EmulatorOptions)
         : ReferenceExpression.Create($"{Endpoint}");
 
     /// <inheritdoc/>

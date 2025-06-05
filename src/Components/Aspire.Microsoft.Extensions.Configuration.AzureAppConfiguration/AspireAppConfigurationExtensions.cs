@@ -7,6 +7,8 @@ using Azure.Identity;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Azure.Core.Pipeline;
+using Azure.Core;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -17,8 +19,21 @@ public static class AspireAppConfigurationExtensions
 {
     internal const string DefaultConfigSectionName = "Aspire:Microsoft:Extensions:Configuration:AzureAppConfiguration";
     internal const string ActivitySourceName = "Microsoft.Extensions.Configuration.AzureAppConfiguration";
-    internal const string DefaultEmulatorAccessKeyId = "default";
-    internal const string DefaultEmulatorAccesskeySecret = "abcdefghijklmnopqrstuvwxyz1234567890";
+
+    internal sealed class RemoveAuthorizationHeaderPolicy : HttpPipelinePolicy
+    {
+        public override void Process(HttpMessage message, ReadOnlyMemory<HttpPipelinePolicy> pipeline)
+        {
+            message.Request.Headers.Remove("Authorization");
+            ProcessNext(message, pipeline);
+        }
+
+        public override ValueTask ProcessAsync(HttpMessage message, ReadOnlyMemory<HttpPipelinePolicy> pipeline)
+        {
+            message.Request.Headers.Remove("Authorization");
+            return ProcessNextAsync(message, pipeline);
+        }
+    }
 
     /// <summary>
     /// Adds the Azure App Configuration to be configuration in the <paramref name="builder"/>.
@@ -50,22 +65,27 @@ public static class AspireAppConfigurationExtensions
 
         configureSettings?.Invoke(settings);
 
-        if (settings.Endpoint is null)
+        if (settings.Endpoint is null && settings.ConnectionString is null)
         {
-            throw new InvalidOperationException($"Endpoint is missing. It should be provided in 'ConnectionStrings:{connectionName}' or under the 'Endpoint' key in the '{DefaultConfigSectionName}' configuration section.");
+            throw new InvalidOperationException($"Endpoint and connection string are missing. It should be provided in 'ConnectionStrings:{connectionName}' or under the 'Endpoint' and 'ConnectionString' key in the '{DefaultConfigSectionName}' configuration section.");
         }
 
         builder.Configuration.AddAzureAppConfiguration(
             options =>
             {
-                string host = settings.Endpoint.Host.ToLowerInvariant();
-                if (host == "localhost" || host == "127.0.0.1") // emulator
+                if (settings.ConnectionString is null)
                 {
-                    options.Connect($"Endpoint={settings.Endpoint};Id={DefaultEmulatorAccessKeyId};Secret={DefaultEmulatorAccesskeySecret}");
+                    options.Connect(settings.Endpoint, settings.Credential ?? new DefaultAzureCredential());
                 }
                 else
                 {
-                    options.Connect(settings.Endpoint, settings.Credential ?? new DefaultAzureCredential());
+                    options.Connect(settings.ConnectionString);
+                    if (settings.AnonymousAccess)
+                    {
+                        // remove the Authorization header to send anonymous requests
+                        options.ConfigureClientOptions(clientOptions =>
+                            clientOptions.AddPolicy(new RemoveAuthorizationHeaderPolicy(), HttpPipelinePosition.PerRetry));
+                    }
                 }
                 configureOptions?.Invoke(options);
             },
