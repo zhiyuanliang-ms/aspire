@@ -102,10 +102,31 @@ public static class AzureAppConfigurationExtensions
     /// <param name="builder">The builder for the <see cref="AzureAppConfigurationEmulatorResource"/>.</param>
     /// <param name="filePath">File path to the AppHost where emulator storage is persisted between runs.</param>
     /// <returns>A builder for the <see cref="AzureAppConfigurationEmulatorResource"/>.</returns>
-    public static IResourceBuilder<AzureAppConfigurationEmulatorResource> WithDataBindMount(this IResourceBuilder<AzureAppConfigurationEmulatorResource> builder, string filePath)
+    public static IResourceBuilder<AzureAppConfigurationEmulatorResource> WithDataBindMount(this IResourceBuilder<AzureAppConfigurationEmulatorResource> builder, string? filePath = null)
     {
         ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-        ArgumentException.ThrowIfNullOrEmpty(filePath, nameof(filePath));
+
+        const string DefaultDirectory = ".aace";
+        const string DefaultFileName = "kv.ndjson";
+
+        if (filePath == null)
+        {
+            Directory.CreateDirectory(DefaultDirectory);
+            filePath = Path.Combine(DefaultDirectory, DefaultFileName);
+        }
+        else
+        {
+            var directory = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+        }
+
+        if (!File.Exists(filePath))
+        {
+            using (File.Create(filePath)) { }
+        }
 
         return builder.WithBindMount(filePath, "/app/.aace/kv.ndjson", isReadOnly: false);
     }

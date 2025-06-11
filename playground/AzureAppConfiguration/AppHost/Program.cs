@@ -7,8 +7,8 @@ var appConfig = builder
     .AddAzureAppConfiguration("aspire-appconfig")
     .RunAsEmulator(emulator =>
     {
-        emulator.WithDataBindMount("C:/Users/zhiyuanliang/Downloads/.aace/kv.ndjson");
-        //emulator.WithAnonymousAccess();
+        emulator.WithDataBindMount();
+        emulator.WithAnonymousAccess();
         //emulator.WithAccessKey("xxxx", "xxxx");
     });
 
