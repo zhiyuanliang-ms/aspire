@@ -17,6 +17,6 @@ internal static class AzureAppConfigurationEmulatorConnectionString
         {
             return ReferenceExpression.Create($"Endpoint={endpoint.Property(EndpointProperty.Url)};Id=anonymous;Secret=abcdefghijklmnopqrstuvwxyz1234567890;Anonymous=True");
         }
-        throw new InvalidOperationException("Cannot create connection string for Azure App Configuration emulator.");
+        throw new InvalidOperationException("Cannot create connection string for Azure App Configuration emulator. No authentication method is configured.");
     }
 }

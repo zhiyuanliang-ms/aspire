@@ -90,6 +90,7 @@ public static class AzureAppConfigurationExtensions
         {
             var surrogate = new AzureAppConfigurationEmulatorResource(builder.Resource);
             var surrogateBuilder = builder.ApplicationBuilder.CreateResourceBuilder(surrogate);
+            surrogateBuilder.ConfigureAnonymousAccess(enabled: true, role: "Owner"); // enable anonymous access by default
             configureEmulator(surrogateBuilder);
         }
 
@@ -135,12 +136,13 @@ public static class AzureAppConfigurationExtensions
     /// 
     /// </summary>
     /// <param name="builder"></param>
+    /// <param name="enabled"></param>
     /// <param name="role"> The role to assign to the anonymous user. Defaults to "Owner".</param>
     /// <returns></returns>
-    public static IResourceBuilder<AzureAppConfigurationEmulatorResource> WithAnonymousAccess(this IResourceBuilder<AzureAppConfigurationEmulatorResource> builder, string role = "Owner")
+    public static IResourceBuilder<AzureAppConfigurationEmulatorResource> ConfigureAnonymousAccess(this IResourceBuilder<AzureAppConfigurationEmulatorResource> builder, bool enabled = true, string role = "Owner")
     {
-        builder.Resource.EnableAnonymousAuthentication(role);
-        builder.WithEnvironment("Tenant:AnonymousAuthEnabled", "true");
+        builder.Resource.ConfigureAnonymousAuthentication(enabled, role);
+        builder.WithEnvironment("Tenant:AnonymousAuthEnabled", enabled.ToString().ToLower());
         builder.WithEnvironment("Authentication:Anonymous:AnonymousUserRole", role);
         return builder;
     }
@@ -152,7 +154,7 @@ public static class AzureAppConfigurationExtensions
     /// <param name="id"></param>
     /// <param name="secret"></param>
     /// <returns></returns>
-    public static IResourceBuilder<AzureAppConfigurationEmulatorResource> WithAccessKey(this IResourceBuilder<AzureAppConfigurationEmulatorResource> builder, string id, string secret)
+    public static IResourceBuilder<AzureAppConfigurationEmulatorResource> AddAccessKey(this IResourceBuilder<AzureAppConfigurationEmulatorResource> builder, string id, string secret)
     {
         int index = builder.Resource.AddAccessKey(id, secret);
         builder.WithEnvironment("Tenant:HmacSha256Enabled", "true");
