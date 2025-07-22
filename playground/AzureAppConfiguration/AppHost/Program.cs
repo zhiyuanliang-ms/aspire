@@ -5,10 +5,11 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 var appConfig = builder
     .AddAzureAppConfiguration("aspire-appconfig")
-    .RunAsEmulator(emulator =>
-    {
-        emulator.WithDataBindMount();
-    });
+    .RunAsExisting("Aspire-Demo-LZY", "Dev");
+    //.RunAsEmulator(emulator =>
+    //{
+    //    emulator.WithDataBindMount();
+    //});
 
 builder.AddProject<Projects.WorkerService>("workerservice")
     .WithReference(appConfig);
