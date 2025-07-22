@@ -6,7 +6,6 @@ using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Tests.Utils;
 using Aspire.Hosting.Utils;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
 
 namespace Aspire.Hosting.Redis.Tests;
 
@@ -300,8 +299,6 @@ public class AddRedisTests
         redis1.WithEndpoint("tcp", e => e.AllocatedEndpoint = new AllocatedEndpoint(e, "localhost", 5001));
         redis2.WithEndpoint("tcp", e => e.AllocatedEndpoint = new AllocatedEndpoint(e, "localhost", 5002));
 
-        await builder.Eventing.PublishAsync<AfterEndpointsAllocatedEvent>(new(app.Services, app.Services.GetRequiredService<DistributedApplicationModel>()));
-
         var redisInsight = Assert.Single(builder.Resources.OfType<RedisInsightResource>());
         var envs = await redisInsight.GetEnvironmentVariableValuesAsync();
 
@@ -490,9 +487,9 @@ public class AddRedisTests
         // Add fake allocated endpoints.
         redis.WithEndpoint("tcp", e => e.AllocatedEndpoint = new AllocatedEndpoint(e, "localhost", 5001));
 
-        await builder.Eventing.PublishAsync<AfterEndpointsAllocatedEvent>(new(app.Services, app.Services.GetRequiredService<DistributedApplicationModel>()));
-
         var commander = builder.Resources.Single(r => r.Name.Equals("rediscommander"));
+
+        await builder.Eventing.PublishAsync<BeforeResourceStartedEvent>(new(commander, app.Services));
 
         var config = await EnvironmentVariableEvaluator.GetEnvironmentVariablesAsync(
             commander,
@@ -514,9 +511,9 @@ public class AddRedisTests
         // Add fake allocated endpoints.
         redis.WithEndpoint("tcp", e => e.AllocatedEndpoint = new AllocatedEndpoint(e, "localhost", 5001));
 
-        await builder.Eventing.PublishAsync<AfterEndpointsAllocatedEvent>(new(app.Services, app.Services.GetRequiredService<DistributedApplicationModel>()));
-
         var commander = builder.Resources.Single(r => r.Name.Equals("rediscommander"));
+
+        await builder.Eventing.PublishAsync<BeforeResourceStartedEvent>(new(commander, app.Services));
 
         var config = await EnvironmentVariableEvaluator.GetEnvironmentVariablesAsync(commander);
 
@@ -535,9 +532,9 @@ public class AddRedisTests
         redis1.WithEndpoint("tcp", e => e.AllocatedEndpoint = new AllocatedEndpoint(e, "localhost", 5001));
         redis2.WithEndpoint("tcp", e => e.AllocatedEndpoint = new AllocatedEndpoint(e, "localhost", 5002, "host2"));
 
-        await builder.Eventing.PublishAsync<AfterEndpointsAllocatedEvent>(new(app.Services, app.Services.GetRequiredService<DistributedApplicationModel>()));
-
         var commander = builder.Resources.Single(r => r.Name.Equals("rediscommander"));
+
+        await builder.Eventing.PublishAsync<BeforeResourceStartedEvent>(new(commander, app.Services));
 
         var config = await EnvironmentVariableEvaluator.GetEnvironmentVariablesAsync(
             commander,

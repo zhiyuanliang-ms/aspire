@@ -8,11 +8,6 @@ internal static class AzureAppConfigurationEmulatorConnectionString
 {
     public static ReferenceExpression Create(EndpointReference endpoint, AzureAppConfigurationEmulatorOptions options)
     {
-        if (options.HmacAuthenticationEnabled && options.AccessKeys.Any())
-        {
-            return ReferenceExpression.Create($"Endpoint={endpoint.Property(EndpointProperty.Url)};Id={options.AccessKeys.First().Id};Secret={options.AccessKeys.First().Secret}");
-
-        }
         if (options.AnonymousAccessEnabled)
         {
             return ReferenceExpression.Create($"Endpoint={endpoint.Property(EndpointProperty.Url)};Id=anonymous;Secret=abcdefghijklmnopqrstuvwxyz1234567890;Anonymous=True");

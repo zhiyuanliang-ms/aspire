@@ -8,7 +8,6 @@ var appConfig = builder
     .RunAsEmulator(emulator =>
     {
         emulator.WithDataBindMount();
-        emulator.ConfigureAnonymousAccess(false);
     });
 
 builder.AddProject<Projects.WorkerService>("workerservice")

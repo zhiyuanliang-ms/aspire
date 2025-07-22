@@ -227,6 +227,11 @@
         <target state="translated">Afficher une valeur</target>
         <note />
       </trans-unit>
+      <trans-unit id="HideHiddenResources">
+        <source>Hide hidden resources</source>
+        <target state="translated">Ne pas afficher les ressources masquées</target>
+        <note />
+      </trans-unit>
       <trans-unit id="LabelAll">
         <source>(All)</source>
         <target state="translated">(Tout)</target>
@@ -242,10 +247,10 @@
         <target state="translated">(Aucun)</target>
         <note />
       </trans-unit>
-      <trans-unit id="LabelUnset">
+      <trans-unit id="LabelValueUnset">
         <source>(Unset)</source>
-        <target state="translated">(Annuler)</target>
-        <note />
+        <target state="translated">(Non défini)</target>
+        <note>Unset is a noun, not a verb, to indicate that the value has not been set.</note>
       </trans-unit>
       <trans-unit id="LinkAddressColumnHeader">
         <source>Address</source>
@@ -420,6 +425,11 @@
       <trans-unit id="SelectAnApplication">
         <source>Select an application</source>
         <target state="translated">Sélectionner une application</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ShowHiddenResources">
+        <source>Show hidden resources</source>
+        <target state="translated">Afficher les ressources masquées</target>
         <note />
       </trans-unit>
       <trans-unit id="SpanDetailsBacklinksHeader">

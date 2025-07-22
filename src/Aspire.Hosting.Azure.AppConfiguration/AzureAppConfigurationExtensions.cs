@@ -148,22 +148,6 @@ public static class AzureAppConfigurationExtensions
     }
 
     /// <summary>
-    ///  
-    /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="id"></param>
-    /// <param name="secret"></param>
-    /// <returns></returns>
-    public static IResourceBuilder<AzureAppConfigurationEmulatorResource> AddAccessKey(this IResourceBuilder<AzureAppConfigurationEmulatorResource> builder, string id, string secret)
-    {
-        int index = builder.Resource.AddAccessKey(id, secret);
-        builder.WithEnvironment("Tenant:HmacSha256Enabled", "true");
-        builder.WithEnvironment($"Tenant:AccessKeys:{index}:Id", id);
-        builder.WithEnvironment($"Tenant:AccessKeys:{index}:Secret", secret);
-        return builder;
-    }
-
-    /// <summary>
     /// Assigns the specified roles to the given resource, granting it the necessary permissions
     /// on the target Azure App Configuration resource. This replaces the default role assignments for the resource.
     /// </summary>

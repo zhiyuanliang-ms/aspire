@@ -8,9 +8,6 @@ namespace Aspire.Cli.Tests.TestServices;
 
 internal sealed class TestAppHostBackchannel : IAppHostBackchannel
 {
-    public TaskCompletionSource? PingAsyncCalled { get; set; }
-    public Func<long, Task<long>>? PingAsyncCallback { get; set; }
-
     public TaskCompletionSource? RequestStopAsyncCalled { get; set; }
     public Func<Task>? RequestStopAsyncCallback { get; set; }
 
@@ -20,22 +17,17 @@ internal sealed class TestAppHostBackchannel : IAppHostBackchannel
     public TaskCompletionSource? GetResourceStatesAsyncCalled { get; set; }
     public Func<CancellationToken, IAsyncEnumerable<RpcResourceState>>? GetResourceStatesAsyncCallback { get; set; }
 
+    public TaskCompletionSource? GetAppHostLogEntriesAsyncCalled { get; set; }
+    public Func<CancellationToken, IAsyncEnumerable<BackchannelLogEntry>>? GetAppHostLogEntriesAsyncCallback { get; set; }
+
     public TaskCompletionSource? ConnectAsyncCalled { get; set; }
     public Func<string, CancellationToken, Task>? ConnectAsyncCallback { get; set; }
 
     public TaskCompletionSource? GetPublishingActivitiesAsyncCalled { get; set; }
-    public Func<CancellationToken, IAsyncEnumerable<(string, string, bool, bool)>>? GetPublishingActivitiesAsyncCallback { get; set; }
+    public Func<CancellationToken, IAsyncEnumerable<PublishingActivity>>? GetPublishingActivitiesAsyncCallback { get; set; }
 
     public TaskCompletionSource? GetCapabilitiesAsyncCalled { get; set; }
     public Func<CancellationToken, Task<string[]>>? GetCapabilitiesAsyncCallback { get; set; }
-
-    public Task<long> PingAsync(long timestamp, CancellationToken cancellationToken)
-    {
-        PingAsyncCalled?.SetResult();
-        return PingAsyncCallback != null
-            ? PingAsyncCallback.Invoke(timestamp)
-            : Task.FromResult(timestamp);
-    }
 
     public Task RequestStopAsync(CancellationToken cancellationToken)
     {
@@ -104,10 +96,10 @@ internal sealed class TestAppHostBackchannel : IAppHostBackchannel
         }
     }
 
-    public async IAsyncEnumerable<(string Id, string StatusText, bool IsComplete, bool IsError)> GetPublishingActivitiesAsync([EnumeratorCancellation]CancellationToken cancellationToken)
+    public async IAsyncEnumerable<PublishingActivity> GetPublishingActivitiesAsync([EnumeratorCancellation]CancellationToken cancellationToken)
     {
         GetPublishingActivitiesAsyncCalled?.SetResult();
-        if (GetPublishingActivitiesAsyncCallback != null)
+        if (GetPublishingActivitiesAsyncCallback is not null)
         {
             var publishingActivities = GetPublishingActivitiesAsyncCallback.Invoke(cancellationToken).ConfigureAwait(false);
 
@@ -118,14 +110,94 @@ internal sealed class TestAppHostBackchannel : IAppHostBackchannel
         }
         else
         {
-            yield return ("root-activity", "Publishing artifacts", false, false);
-            yield return ("child-1", "Generating YAML goodness", false, false);
-            yield return ("child-1", "Generating YAML goodness", true, false);
-            yield return ("child-2", "Building image 1", false, false);
-            yield return ("child-2", "Building image 1", true, false);
-            yield return ("child-2", "Building image 2", false, false);
-            yield return ("child-2", "Building image 2", true, false);
-            yield return ("root-activity", "Publishing artifacts", true, false);
+            yield return new PublishingActivity
+            {
+                Type = PublishingActivityTypes.Step,
+                Data = new PublishingActivityData
+                {
+                    Id = "root-step",
+                    StatusText = "Publishing artifacts",
+                    CompletionState = CompletionStates.InProgress,
+                    StepId = null
+                }
+            };
+            yield return new PublishingActivity
+            {
+                Type = PublishingActivityTypes.Task,
+                Data = new PublishingActivityData
+                {
+                    Id = "child-task-1",
+                    StatusText = "Generating YAML goodness",
+                    CompletionState = CompletionStates.InProgress,
+                    StepId = "root-step"
+                }
+            };
+            yield return new PublishingActivity
+            {
+                Type = PublishingActivityTypes.Task,
+                Data = new PublishingActivityData
+                {
+                    Id = "child-task-1",
+                    StatusText = "Generating YAML goodness",
+                    CompletionState = CompletionStates.Completed,
+                    StepId = "root-step"
+                }
+            };
+            yield return new PublishingActivity
+            {
+                Type = PublishingActivityTypes.Task,
+                Data = new PublishingActivityData
+                {
+                    Id = "child-task-2",
+                    StatusText = "Building image 1",
+                    CompletionState = CompletionStates.InProgress,
+                    StepId = "root-step"
+                }
+            };
+            yield return new PublishingActivity
+            {
+                Type = PublishingActivityTypes.Task,
+                Data = new PublishingActivityData
+                {
+                    Id = "child-task-2",
+                    StatusText = "Building image 1",
+                    CompletionState = CompletionStates.Completed,
+                    StepId = "root-step"
+                }
+            };
+            yield return new PublishingActivity
+            {
+                Type = PublishingActivityTypes.Task,
+                Data = new PublishingActivityData
+                {
+                    Id = "child-task-2",
+                    StatusText = "Building image 2",
+                    CompletionState = CompletionStates.InProgress,
+                    StepId = "root-step"
+                }
+            };
+            yield return new PublishingActivity
+            {
+                Type = PublishingActivityTypes.Task,
+                Data = new PublishingActivityData
+                {
+                    Id = "child-task-2",
+                    StatusText = "Building image 2",
+                    CompletionState = CompletionStates.Completed,
+                    StepId = "root-step"
+                }
+            };
+            yield return new PublishingActivity
+            {
+                Type = PublishingActivityTypes.Step,
+                Data = new PublishingActivityData
+                {
+                    Id = "root-step",
+                    StatusText = "Publishing artifacts",
+                    CompletionState = CompletionStates.Completed,
+                    StepId = null
+                }
+            };
         }
     }
 
@@ -140,5 +212,28 @@ internal sealed class TestAppHostBackchannel : IAppHostBackchannel
         {
             return ["baseline.v2"];
         }
+    }
+
+    public async IAsyncEnumerable<BackchannelLogEntry> GetAppHostLogEntriesAsync([EnumeratorCancellation]CancellationToken cancellationToken)
+    {
+        GetAppHostLogEntriesAsyncCalled?.SetResult();
+        if (GetAppHostLogEntriesAsyncCallback != null)
+        {
+            await foreach (var entry in GetAppHostLogEntriesAsyncCallback.Invoke(cancellationToken))
+            {
+                yield return entry;
+            }
+        }
+    }
+
+    public Task CompletePromptResponseAsync(string promptId, PublishingPromptInputAnswer[] answers, CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public async IAsyncEnumerable<CommandOutput> ExecAsync([EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        await Task.Delay(1, cancellationToken).ConfigureAwait(false);
+        yield return new CommandOutput { Text = "test", IsErrorMessage = false, LineNumber = 0 };
     }
 }

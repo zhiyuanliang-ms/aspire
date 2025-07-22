@@ -512,7 +512,44 @@ public class AzureCosmosDBExtensionsTests(ITestOutputHelper output)
         Assert.Equal("cosmos", cosmos.Resource.Name);
         Assert.Equal("mycosmosconnectionstring", await connectionStringResource.GetConnectionStringAsync());
     }
-    
+
+    [Fact]
+    public async Task AddAzureCosmosDBViaPublishMode_WithDefaultAzureSku()
+    {
+        using var builder = TestDistributedApplicationBuilder.Create(DistributedApplicationOperation.Publish);
+        var cosmos = builder.AddAzureCosmosDB("cosmos")
+            .WithDefaultAzureSku();
+
+        var manifest = await AzureManifestUtils.GetManifestWithBicep(cosmos.Resource);
+        await Verify(manifest.BicepText, extension: "bicep");
+    }
+
+    [Fact]
+    public void RunAsEmulatorAppliesEmulatorResourceAnnotation()
+    {
+        using var builder = TestDistributedApplicationBuilder.Create();
+        var cosmos = builder.AddAzureCosmosDB("cosmos")
+                           .RunAsEmulator();
+
+        // Verify that the EmulatorResourceAnnotation is applied
+        Assert.True(cosmos.Resource.IsEmulator());
+        Assert.Contains(cosmos.Resource.Annotations, a => a is EmulatorResourceAnnotation);
+    }
+
+    [Fact]
+    public void RunAsPreviewEmulatorAppliesEmulatorResourceAnnotation()
+    {
+        using var builder = TestDistributedApplicationBuilder.Create();
+#pragma warning disable ASPIRECOSMOSDB001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        var cosmos = builder.AddAzureCosmosDB("cosmos")
+                           .RunAsPreviewEmulator();
+#pragma warning restore ASPIRECOSMOSDB001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
+        // Verify that the EmulatorResourceAnnotation is applied
+        Assert.True(cosmos.Resource.IsEmulator());
+        Assert.Contains(cosmos.Resource.Annotations, a => a is EmulatorResourceAnnotation);
+    }
+
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "ExecuteBeforeStartHooksAsync")]
     private static extern Task ExecuteBeforeStartHooksAsync(DistributedApplication app, CancellationToken cancellationToken);
 }

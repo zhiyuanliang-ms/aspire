@@ -123,7 +123,6 @@
   <data name="ChartContainerFiltersHeader" xml:space="preserve">
     <value>Filters</value>
   </data>
-
   <data name="ChartContainerGraphTab" xml:space="preserve">
     <value>Graph</value>
   </data>
@@ -240,7 +239,6 @@
   <data name="MetricTableStartColumnHeader" xml:space="preserve">
     <value>Time</value>
   </data>
-
   <data name="MetricTableShowOnlyValueChanges" xml:space="preserve">
     <value>Only show value updates</value>
   </data>
@@ -328,7 +326,6 @@
   <data name="StructuredLogsDetailsResourceHeader" xml:space="preserve">
     <value>Resource</value>
   </data>
-
   <data name="SpanDetailsContextHeader" xml:space="preserve">
     <value>Context</value>
   </data>
@@ -395,12 +392,12 @@
   <data name="FluentDataGridHeaderCellSubmitAriaLabelText" xml:space="preserve">
     <value>Set column widths</value>
   </data>
-
   <data name="LabelEmpty" xml:space="preserve">
     <value>(Empty)</value>
   </data>
-  <data name="LabelUnset" xml:space="preserve">
+  <data name="LabelValueUnset" xml:space="preserve">
     <value>(Unset)</value>
+    <comment>Unset is a noun, not a verb, to indicate that the value has not been set.</comment>
   </data>
   <data name="ActionsColumnHeader" xml:space="preserve">
     <value>Actions</value>
@@ -475,5 +472,11 @@
   </data>
   <data name="ToggleNesting" xml:space="preserve">
     <value>Toggle nesting</value>
+  </data>
+  <data name="ShowHiddenResources" xml:space="preserve">
+    <value>Show hidden resources</value>
+  </data>
+  <data name="HideHiddenResources" xml:space="preserve">
+    <value>Hide hidden resources</value>
   </data>
 </root>

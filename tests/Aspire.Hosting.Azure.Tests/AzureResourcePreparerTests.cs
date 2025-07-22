@@ -52,7 +52,7 @@ public class AzureResourcePreparerTests
         }
 
         var storage = builder.AddAzureStorage("storage");
-        var blobs = storage.AddBlobs("blobs");
+        var blobs = storage.AddBlobService("blobs");
 
         var api = builder.AddProject<Project>("api", launchProfileName: null)
             .WithReference(blobs);
@@ -71,7 +71,7 @@ public class AzureResourcePreparerTests
 
             var storageRolesManifest = await GetManifestWithBicep(storageRoles, skipPreparer: true);
             await Verify(storageRolesManifest.BicepText, extension: "bicep");
-            
+
         }
         else
         {
@@ -93,7 +93,7 @@ public class AzureResourcePreparerTests
         builder.AddAzureContainerAppEnvironment("env");
 
         var storage = builder.AddAzureStorage("storage");
-        var blobs = storage.AddBlobs("blobs");
+        var blobs = storage.AddBlobService("blobs");
 
         var api = builder.AddProject<Project>("api", launchProfileName: null)
             .WithRoleAssignments(storage, StorageBuiltInRole.StorageBlobDelegator, StorageBuiltInRole.StorageBlobDataReader)
@@ -115,7 +115,7 @@ public class AzureResourcePreparerTests
 
             var storageRolesManifest = await GetManifestWithBicep(storageRoles, skipPreparer: true);
             await Verify(storageRolesManifest.BicepText, extension: "bicep");
-            
+
         }
         else
         {
@@ -134,13 +134,35 @@ public class AzureResourcePreparerTests
     }
 
     [Fact]
+    public async Task DoesNotApplyRoleAssignmentsInRunModeForEmulators()
+    {
+        using var builder = TestDistributedApplicationBuilder.Create(DistributedApplicationOperation.Run);
+        builder.AddAzureContainerAppEnvironment("env");
+
+        builder.AddBicepTemplateString("foo", "");
+
+        var dbsrv = builder.AddAzureSqlServer("dbsrv").RunAsContainer();
+        var db = dbsrv.AddDatabase("db");
+
+        var api = builder.AddProject<Project>("api", launchProfileName: null)
+            .WithReference(db);
+
+        using var app = builder.Build();
+        var model = app.Services.GetRequiredService<DistributedApplicationModel>();
+        await ExecuteBeforeStartHooksAsync(app, default);
+
+        // in RunMode, we skip applying the role assignments to a new 'dbsrv-roles' resource, since the storage is running as emulator.
+        Assert.DoesNotContain(model.Resources.OfType<AzureProvisioningResource>(), r => r.Name == "dbsrv-roles");
+    }
+
+    [Fact]
     public async Task FindsAzureReferencesFromArguments()
     {
         using var builder = TestDistributedApplicationBuilder.Create(DistributedApplicationOperation.Publish);
         builder.AddAzureContainerAppEnvironment("env");
 
         var storage = builder.AddAzureStorage("storage");
-        var blobs = storage.AddBlobs("blobs");
+        var blobs = storage.AddBlobService("blobs");
 
         // the project doesn't WithReference or WithRoleAssignments, so it should get the default role assignments
         var api = builder.AddProject<Project>("api", launchProfileName: null)
