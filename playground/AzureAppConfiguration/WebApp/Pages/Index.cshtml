@@ -1,0 +1,55 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="container">
+    <h2>@Model.Message</h2>
+    <button onclick="fetchWeather()">Get Weather</button>
+    <div class="loading" id="loading">Loading weather data...</div>
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    function fetchWeather() {
+        const button = document.querySelector('button');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        
+        // Show loading state
+        button.disabled = true;
+        button.textContent = 'Loading...';
+        loading.classList.add('show');
+        result.classList.remove('show');
+        
+        fetch('/?handler=Weather')
+        .then(res => res.json())
+        .then(data => {
+            const weatherEmoji = getWeatherEmoji(data.summary);
+            result.innerHTML = 
+                `<div class="weather-icon">${weatherEmoji}</div>
+                 <strong>Weather:</strong> ${data.summary}<br/>
+                 <strong>Temperature:</strong> ${data.temperature}°C`;
+            result.classList.add('show');
+        })
+        .catch(err => {
+            result.innerHTML = `<div class="weather-icon">❌</div>Error: ${err}`;
+            result.classList.add('show');
+        })
+        .finally(() => {
+            // Reset button state
+            button.disabled = false;
+            button.textContent = 'Get Weather';
+            loading.classList.remove('show');
+        });
+    }
+    
+    function getWeatherEmoji(summary) {
+        const weather = summary.toLowerCase();
+        if (weather.includes('sunny')) return '☀️';
+        if (weather.includes('cloud')) return '☁️';
+        if (weather.includes('rain')) return '🌧️';
+        return '🌤️';
+    }
+</script>

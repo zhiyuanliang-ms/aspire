@@ -3,15 +3,17 @@
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var appConfig = builder
-    .AddAzureAppConfiguration("aspire-appconfig")
-    .RunAsExisting("Aspire-Demo-LZY", "Dev");
-    //.RunAsEmulator(emulator =>
-    //{
-    //    emulator.WithDataBindMount();
-    //});
+// API from package "Aspire.Hosting.Azure.AppConfiguration"
+var appConfig = builder.AddAzureAppConfiguration("config-dev")
+    //.RunAsExisting("Aspire-Demo-LZY", "Dev");
+    .RunAsEmulator(emulator =>
+    {
+        emulator.WithDataBindMount();
+    });
 
-builder.AddProject<Projects.WorkerService>("workerservice")
-    .WithReference(appConfig);
+var weatherApi = builder.AddProject<Projects.WeatherApi>("weatherapi");
+var _ = builder.AddProject<Projects.WebApp>("webapp")
+    .WithReference(appConfig)
+    .WithReference(weatherApi); // Reference different components
 
 builder.Build().Run();
