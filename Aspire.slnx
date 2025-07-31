@@ -102,6 +102,11 @@
     <File Path="playground/README.md" />
     <Project Path="playground/Playground.ServiceDefaults/Playground.ServiceDefaults.csproj" />
   </Folder>
+  <Folder Name="/playground/AzureAppConfiguration/" Id="02ea681e-c7d8-13c7-8484-4ac65e1b71e8">
+    <Project Path="playground/AzureAppConfiguration/AppHost/AppHost.csproj" Id="e4bdd966-f8a6-455d-bcc9-9bb633c4e1e5" />
+    <Project Path="playground/AzureAppConfiguration/WeatherApi/WeatherApi.csproj" />
+    <Project Path="playground/AzureAppConfiguration/WebApp/WebApp.csproj" />
+  </Folder>
   <Folder Name="/playground/AzureAIFoundryEndToEnd/">
     <Project Path="playground/AzureAIFoundryEndToEnd/AzureAIFoundryEndToEnd.AppHost/AzureAIFoundryEndToEnd.AppHost.csproj" />
     <Project Path="playground/AzureAIFoundryEndToEnd/AzureAIFoundryEndToEnd.WebStory/AzureAIFoundryEndToEnd.WebStory.csproj" />
