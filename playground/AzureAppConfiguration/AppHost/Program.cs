@@ -4,12 +4,12 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 // API from package "Aspire.Hosting.Azure.AppConfiguration"
-var appConfig = builder.AddAzureAppConfiguration("config-dev")
-    //.RunAsExisting("Aspire-Demo-LZY", "Dev");
-    .RunAsEmulator(emulator =>
-    {
-        emulator.WithDataBindMount();
-    });
+var appConfig =
+    builder.AddAzureAppConfiguration("config-dev")
+.RunAsEmulator(emulator => // new API
+{
+    emulator.WithDataBindMount(); // mount a local file for key value storage
+});
 
 var weatherApi = builder.AddProject<Projects.WeatherApi>("weatherapi");
 var _ = builder.AddProject<Projects.WebApp>("webapp")

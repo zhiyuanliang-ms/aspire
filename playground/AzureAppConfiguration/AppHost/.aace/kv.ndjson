@@ -1,2 +1,17 @@
 {"ts":1753168979,"etag":"VdwGIM6DEl0aphAeUjh2KQ","key":".appconfig.featureflag/Beta","content_type":"application/vnd.microsoft.appconfig.ff\u002Bjson;charset=utf-8","value":"{\u0022id\u0022:\u0022Beta\u0022,\u0022enabled\u0022:true}","rev_ttl":604800}
 {"ts":1753237444,"etag":"OnPHwxD3btSrv-oN5V-PDQ","key":"Message","value":"Hello from App Config.","rev_ttl":604800}
+{"ts":1753259124,"etag":"sVWK-mK57j0hJ3UvxbpoAw","key":"Message","value":"Hello from App Config emulator.","rev_ttl":604800}
+{"ts":1753259162,"etag":"3BufM88WXEOydrWVKzk4Tg","key":".appconfig.featureflag/Beta","content_type":"application/vnd.microsoft.appconfig.ff\u002Bjson;charset=utf-8","value":"{\u0022id\u0022:\u0022Beta\u0022,\u0022enabled\u0022:false}","rev_ttl":604800}
+{"ts":1753259182,"etag":"V5QWm0erZroQvcKFjqNgqw","key":".appconfig.featureflag/Beta","content_type":"application/vnd.microsoft.appconfig.ff\u002Bjson;charset=utf-8","value":"{\u0022id\u0022:\u0022Beta\u0022,\u0022enabled\u0022:true}","rev_ttl":604800}
+{"ts":1753347912,"etag":"QV3YWfRPZmLL0SGl54JhVA","key":".appconfig.featureflag/Beta","content_type":"application/vnd.microsoft.appconfig.ff\u002Bjson;charset=utf-8","value":"{\u0022id\u0022:\u0022Beta\u0022,\u0022enabled\u0022:false}","rev_ttl":604800}
+{"ts":1753350385,"etag":"vtd321tqtTsifhicmd1IOA","key":".appconfig.featureflag/Beta","content_type":"application/vnd.microsoft.appconfig.ff\u002Bjson;charset=utf-8","value":"{\u0022id\u0022:\u0022Beta\u0022,\u0022enabled\u0022:true}","rev_ttl":604800}
+{"ts":1753376616,"etag":"295DcqKN0oQcH9UKqcpWOw","key":"TestKey","label":"dev","value":"123","tags":{"tag1":""},"rev_ttl":604800}
+{"ts":1753376623,"etag":"sM_7jvZRj6vWsHh7e5FZ4w","key":"TestKey","label":"dev","rev_ttl":604800,"deleted":1753376623}
+{"ts":1753376638,"etag":"nE7520fsXuxxmZ567ua0aw","key":".appconfig.featureflag/Beta","content_type":"application/vnd.microsoft.appconfig.ff\u002Bjson;charset=utf-8","value":"{\u0022id\u0022:\u0022Beta\u0022,\u0022enabled\u0022:false}","rev_ttl":604800}
+{"ts":1753376647,"etag":"uCbhYhgc-4-FPUFsAhqgUQ","key":".appconfig.featureflag/Beta","content_type":"application/vnd.microsoft.appconfig.ff\u002Bjson;charset=utf-8","value":"{\u0022id\u0022:\u0022Beta\u0022,\u0022enabled\u0022:true}","rev_ttl":604800}
+{"ts":1753376734,"etag":"U6T9cCHE60W2a0LNIa_xcQ","key":"Message","value":"Hello from App Config emulator - updated","rev_ttl":604800}
+{"ts":1753376758,"etag":"pST6yFN77es05knPAB6BhA","key":"Message","value":"Hello from App Config emulator.","rev_ttl":604800}
+{"ts":1753400223,"etag":"yHiv5dDW0BIzg2yOmhxGUQ","key":".appconfig.featureflag/Beta","content_type":"application/vnd.microsoft.appconfig.ff\u002Bjson;charset=utf-8","value":"{\u0022id\u0022:\u0022Beta\u0022,\u0022enabled\u0022:false}","rev_ttl":604800}
+{"ts":1753400253,"etag":"hT9fp3it4qoRZ8JHczBdsA","key":"Message","value":"Hello from App Config emulator - updated.","rev_ttl":604800}
+{"ts":1753400291,"etag":"b0ixY7zPwPtQSos-NtHLqg","key":"TestKey","label":"dev","value":"","tags":{"tag1":"value11"},"rev_ttl":604800}
+{"ts":1753400364,"etag":"8dgLVO7y9MOtp8pPpEapXg","key":".appconfig.featureflag/Alpha","content_type":"application/vnd.microsoft.appconfig.ff\u002Bjson;charset=utf-8","value":"{\u0022id\u0022:\u0022Alpha\u0022,\u0022enabled\u0022:true,\u0022condtions\u0022:{\u0022client_filtets\u0022:[]}}","rev_ttl":604800}
