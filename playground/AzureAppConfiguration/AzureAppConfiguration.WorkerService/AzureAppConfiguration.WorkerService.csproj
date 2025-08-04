@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>$(DefaultTargetFramework)</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AspireProjectOrPackageReference Include="Aspire.Microsoft.Extensions.Configuration.AzureAppConfiguration" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Playground.ServiceDefaults\Playground.ServiceDefaults.csproj" />
+  </ItemGroup>
+</Project>
