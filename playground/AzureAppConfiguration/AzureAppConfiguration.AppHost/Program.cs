@@ -7,8 +7,8 @@ var appConfig =
     builder.AddAzureAppConfiguration("appconfig")
     .RunAsEmulator(emulator =>
     {
-        //emulator.WithDataBindMount("data"); // mount a local file for key value storage
-        emulator.WithDataVolume("data");
+        emulator.WithDataBindMount("data"); // mount a local file for key value storage
+        // emulator.WithDataVolume("data");
     });
 
 builder.AddProject<Projects.AzureAppConfiguration_WorkerService>("workerservice")
